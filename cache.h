@@ -6,34 +6,38 @@
 #include <string.h>
 //-----------------------------------------------------------------------------
 
-typedef struct {
+typedef struct __ce {
 				time_t add_time;
 				char *q;
-				celement *prev;
-				celement *next;
+				struct __ce *prev;
+				struct __ce *next;
 } celement;
 
-typedef struct {
+typedef struct __ca {
 				celement *root;
 				int count;
+				time_t maxtime;
+				int maxsize;
 } cache;
 //-----------------------------------------------------------------------------
 
-void cache_init(cache *c);
-int cache_update(cache *c, time_t maxtime);
-int add_str(cache *c, char *str, int maxsize);
-int remove(cache *c, celement *p);
+void cache_init(cache *c, time_t maxtime, int maxsize);
+int cache_update(cache *c);
+int add_str(cache *c, char *str);
+int cremove(cache *c, celement *p);
 int in_cache(cache *c, char *str);
 //-----------------------------------------------------------------------------
 
-int cache_init(cache *c)
+void cache_init(cache *c, time_t maxtime, int maxsize)
 {
 	c->root = NULL;
 	c->count = 0;
+	c->maxtime = maxtime;
+	c->maxsize = maxsize;
 }
 //-----------------------------------------------------------------------------
 
-int cache_update(cache *c, time_t maxtime)
+int cache_update(cache *c)
 {
 	int removed = 0;
 	time_t curr = time(NULL);
@@ -41,21 +45,21 @@ int cache_update(cache *c, time_t maxtime)
 	celement *p = c->root;
 	do
 	{
-		if((curr - p->add_time) >= maxtime)
+		if((curr - p->add_time) >= c->maxtime)
 		{
-			remove(c, p);
+			cremove(c, p);
 			removed++;
 		}
 	}
-	while(p = p->next)
+	while(p = p->next);
 	return removed;
 }
 //-----------------------------------------------------------------------------
 
-int add_str(cache *c, char *str, int maxsize)
+int add_str(cache *c, char *str)
 {
-	if(c->count >= maxsize) return -1;
-	if(in_cache(c, str)) return -2;
+	if(c->count >= c->maxsize) return -1;
+	if(in_cache(c, str) != -1) return -2;
 	else if(c->root == NULL)
 	{
 		c->root = (celement*)malloc(sizeof(celement));
@@ -79,10 +83,18 @@ int add_str(cache *c, char *str, int maxsize)
 }
 //-----------------------------------------------------------------------------
 
-int remove(cache *c, celement *p)
+int cremove(cache *c, celement *p)
 {
-	p->prev->next = p->next;
-	if(p->next != NULL) p->next->prev = p->prev;
+	if(p == c->root)
+	{
+		c->root = p->next;
+		c->root->prev = p->prev;
+	}
+	else
+	{
+		p->prev->next = p->next;
+		if(p->next != NULL) p->next->prev = p->prev;
+	}
 	free(p->q);
 	free(p);
 	return 0;
@@ -97,10 +109,10 @@ int in_cache(cache *c, char *str)
 	do
 	{
 		if(!strncmp(p->q, str, strlen(str))) return i;
-		i++
+		i++;
 	}
-	while(p = p->next)
-	return removed;
+	while(p = p->next);
+	return -1;
 }
 
 #endif /* __CACHE_H__ */
