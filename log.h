@@ -7,7 +7,6 @@
 #define BUFSIZE 1024
 //-----------------------------------------------------------------------------
 
-// char *text[] = { "asdfasdf", "dfdfdfdff", "acjesqqq", "asdbghf", "ppppppp", "q5q5q5q5r", "atystyatw", "ccmcckddk", "yusyustd", "pp[]]", "qqqqqqqqq", "mqmqmsjjhdhihdhuus" };
 FILE *fd;
 //-----------------------------------------------------------------------------
 
@@ -29,7 +28,7 @@ int parser_init(const char *filename)
 
 int parser_exit(void)
 {
-	return fclose(fd);
+	fclose(fd);
 }
 //-----------------------------------------------------------------------------
 
