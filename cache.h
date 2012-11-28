@@ -21,14 +21,14 @@ typedef struct __ca {
 } cache;
 //-----------------------------------------------------------------------------
 
-void cache_init(cache *c, time_t maxtime, int maxsize);
-int cache_update(cache *c);
-int add_str(cache *c, const char *str);
+void cache_init(cache *c, const time_t maxtime, const int maxsize);
+int cache_update(cache *c, const time_t now);
+int add_str(cache *c, const char *str, const time_t now);
 int cremove(cache *c, celement *p);
 int in_cache(cache *c, const char *str);
 //-----------------------------------------------------------------------------
 
-void cache_init(cache *c, time_t maxtime, int maxsize)
+void cache_init(cache *c, const time_t maxtime, const int maxsize)
 {
 	c->root = NULL;
 	c->count = 0;
@@ -37,16 +37,15 @@ void cache_init(cache *c, time_t maxtime, int maxsize)
 }
 //-----------------------------------------------------------------------------
 
-int cache_update(cache *c)
+int cache_update(cache *c, const time_t now)
 {
 	printf("DEBUG: cache_update()\n");
 	int removed = 0;
-	time_t curr = time(NULL);
 	if(c->root == NULL) return -1;
 	celement *p = c->root;
 	do
 	{
-		if((curr - p->add_time) >= c->maxtime)
+		if((now - p->add_time) >= c->maxtime)
 		{
 			cremove(c, p);
 			removed++;
@@ -57,7 +56,7 @@ int cache_update(cache *c)
 }
 //-----------------------------------------------------------------------------
 
-int add_str(cache *c, const char *str)
+int add_str(cache *c, const char *str, const time_t now)
 {
 	printf("DEBUG: add_str()\n");
 	if(c->count >= c->maxsize) return -1;
@@ -67,7 +66,7 @@ int add_str(cache *c, const char *str)
 		c->root = (celement*)malloc(sizeof(celement));
 		c->root->q = (celement*)malloc(strlen(str));
 		strncpy(c->root->q, str, strlen(str));
-		c->root->add_time = time(NULL);
+		c->root->add_time = now;
 		c->root->next = NULL;
 		c->root->prev = c->root;
 	}
@@ -76,7 +75,7 @@ int add_str(cache *c, const char *str)
 		c->root->prev->next = (celement*)malloc(sizeof(celement));
 		c->root->prev->next->q = (celement*)malloc(strlen(str));
 		strncpy(c->root->prev->next->q, str, strlen(str));
-		c->root->prev->next->add_time = time(NULL);
+		c->root->prev->next->add_time = now;
 		c->root->prev->next->next = NULL;
 		c->root->prev->next->prev = c->root->prev;
 		c->root->prev = c->root->prev->next;
@@ -104,7 +103,7 @@ int cremove(cache *c, celement *p)
 			printf("DEBUG: root\n");
 		}
 	}
-	else
+	else				// shouldn't go there unless someone will remove entries from the middle of cache
 	{
 		printf("DEBUG: p != c->root\n");
 		p->prev->next = p->next;
