@@ -23,9 +23,9 @@ typedef struct __ca {
 
 void cache_init(cache *c, time_t maxtime, int maxsize);
 int cache_update(cache *c);
-int add_str(cache *c, char *str);
+int add_str(cache *c, const char *str);
 int cremove(cache *c, celement *p);
-int in_cache(cache *c, char *str);
+int in_cache(cache *c, const char *str);
 //-----------------------------------------------------------------------------
 
 void cache_init(cache *c, time_t maxtime, int maxsize)
@@ -57,7 +57,7 @@ int cache_update(cache *c)
 }
 //-----------------------------------------------------------------------------
 
-int add_str(cache *c, char *str)
+int add_str(cache *c, const char *str)
 {
 	printf("DEBUG: add_str()\n");
 	if(c->count >= c->maxsize) return -1;
@@ -117,7 +117,7 @@ int cremove(cache *c, celement *p)
 }
 //-----------------------------------------------------------------------------
 
-int in_cache(cache *c, char *str)
+int in_cache(cache *c, const char *str)
 {
 	printf("DEBUG: in_cache()\n");
 	int i = 0;
@@ -131,5 +131,6 @@ int in_cache(cache *c, char *str)
 	while(p = p->next);
 	return -1;
 }
+//-----------------------------------------------------------------------------
 
 #endif /* __CACHE_H__ */

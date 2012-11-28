@@ -13,11 +13,11 @@ int main(void)
 
 	cache *c = (cache*)malloc(sizeof(cache));
 	cache_init(c, max_time, max_size);
+	parser_init("test.log");
 
-
-	q = parse(++i);
-	while(q)
+	while(q = parse())
 	{
+		printf("-------------------------------------------------------------------------------\nCOUNT: %d\n", c->count);
 		printf("[%d] Update removed %d entries\n", time(NULL), cache_update(c));
 		if(in_cache(c, q) != -1) 
 		{
@@ -27,11 +27,15 @@ int main(void)
 		else
 		{
 			miss++;
-			int as = add_str(c, q);
+			int as;				// Taki bajzel, przez jedno goto
+			reswitch:
+			as = add_str(c, q);
 			switch(as)
 			{
 				case -1:
-					printf("[%d] Not inserted %s: cache full\n", time(NULL), q);
+					printf("[%d] Not inserted %s: cache full, reswitching\n", time(NULL), q);
+					cremove(c, c->root);
+					goto reswitch;			// TODO: Poprawic, bo az boli
 					break;
 				case -2:
 					printf("[%d] Not inserted %s: exists in cache\n", time(NULL), q);
@@ -41,7 +45,7 @@ int main(void)
 					break;
 			}
 		}
-		q = parse(++i);
 	}
-	printf("\nHit: %d\nMiss: %d\n", hit, miss);
+	parser_exit();
+	printf("\nHit: %d\nMiss: %d\nEF: %f\n", hit, miss, (double)hit/(double)miss);
 }
