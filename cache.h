@@ -39,6 +39,7 @@ void cache_init(cache *c, time_t maxtime, int maxsize)
 
 int cache_update(cache *c)
 {
+	printf("DEBUG: cache_update()\n");
 	int removed = 0;
 	time_t curr = time(NULL);
 	if(c->root == NULL) return -1;
@@ -58,6 +59,7 @@ int cache_update(cache *c)
 
 int add_str(cache *c, char *str)
 {
+	printf("DEBUG: add_str()\n");
 	if(c->count >= c->maxsize) return -1;
 	if(in_cache(c, str) != -1) return -2;
 	else if(c->root == NULL)
@@ -85,24 +87,39 @@ int add_str(cache *c, char *str)
 
 int cremove(cache *c, celement *p)
 {
+	printf("DEBUG: cremove()\n");
 	if(p == c->root)
 	{
-		c->root = p->next;
-		c->root->prev = p->prev;
+		printf("DEBUG: p == c->root\n");
+		printf("DEBUG: p=%p;pn=%p;pp=%p\n", p, p->next, p->prev);
+		if(p->next == NULL)
+		{
+			c->root = NULL;
+		}
+		else
+		{
+			p->next->prev = p->prev;
+			printf("DEBUG: prev\n");
+			c->root = p->next;
+			printf("DEBUG: root\n");
+		}
 	}
 	else
 	{
+		printf("DEBUG: p != c->root\n");
 		p->prev->next = p->next;
 		if(p->next != NULL) p->next->prev = p->prev;
 	}
+	printf("DEBUG: free()\n");
 	free(p->q);
 	free(p);
-	return 0;
+	return --c->count;
 }
 //-----------------------------------------------------------------------------
 
 int in_cache(cache *c, char *str)
 {
+	printf("DEBUG: in_cache()\n");
 	int i = 0;
 	if(c->root == NULL) return -1;
 	celement *p = c->root;

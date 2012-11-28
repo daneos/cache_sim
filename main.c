@@ -19,7 +19,11 @@ int main(void)
 	while(q)
 	{
 		printf("[%d] Update removed %d entries\n", time(NULL), cache_update(c));
-		if(in_cache(c, q) != -1) hit++;
+		if(in_cache(c, q) != -1) 
+		{
+			hit++;
+			printf("[%d] %s in cache, hit\n", time(NULL), q);
+		}
 		else
 		{
 			miss++;
@@ -33,7 +37,7 @@ int main(void)
 					printf("[%d] Not inserted %s: exists in cache\n", time(NULL), q);
 					break;
 				default:
-					printf("[%d] Inserted %s on index %d\n", time(NULL), q, as);
+					printf("[%d] Inserted %s at index %d\n", time(NULL), q, as);
 					break;
 			}
 		}
