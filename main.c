@@ -5,7 +5,7 @@
 int main(void)
 {
 	int max_size = 1024;
-	time_t max_time = 3600;
+	time_t max_time = 300;
 	int hit = 0;
 	int miss = 0;
 	char *q;
@@ -48,5 +48,5 @@ int main(void)
 		}
 	}
 	parser_exit();
-	printf("\nHit: %d\nMiss: %d\nEF: %f\n", hit, miss, (double)hit/(double)miss);
+	printf("\nHit: %d\nMiss: %d\nEF: %f%%\n", hit, miss, ((double)hit/(double)miss)*100);
 }

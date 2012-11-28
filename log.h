@@ -26,7 +26,7 @@ int parser_init(const char *filename)
 	sprintf(command, "cat %s | cut -d\' \' -f7 > %s", filename, qtmpfn);
 	system(command);
 	sprintf(ttmpfn, "%s.timestamp", filename);
-	sprintf(command, "cat %s | cut -d\' \' -f4 | ./timestamp_gen.py > %s", filename, ttmpfn)
+	sprintf(command, "cat %s | cut -d\' \' -f4 | ./timestamp_gen.py > %s", filename, ttmpfn);
 	system(command);
 	qfd = fopen(qtmpfn, "r");
 	tfd = fopen(ttmpfn, "r");
