@@ -39,7 +39,7 @@ void cache_init(cache *c, const time_t maxtime, const int maxsize)
 
 int cache_update(cache *c, const time_t now)
 {
-	printf("DEBUG: cache_update()\n");
+	// printf("DEBUG: cache_update()\n");
 	int removed = 0;
 	if(c->root == NULL) return -1;
 	celement *p = c->root;
@@ -58,7 +58,7 @@ int cache_update(cache *c, const time_t now)
 
 int add_str(cache *c, const char *str, const time_t now)
 {
-	printf("DEBUG: add_str()\n");
+	// printf("DEBUG: add_str()\n");
 	if(c->count >= c->maxsize) return -1;
 	if(in_cache(c, str) != -1) return -2;
 	else if(c->root == NULL)
@@ -86,11 +86,11 @@ int add_str(cache *c, const char *str, const time_t now)
 
 int cremove(cache *c, celement *p)
 {
-	printf("DEBUG: cremove()\n");
+	// printf("DEBUG: cremove()\n");
 	if(p == c->root)
 	{
-		printf("DEBUG: p == c->root\n");
-		printf("DEBUG: p=%p;pn=%p;pp=%p\n", p, p->next, p->prev);
+		// printf("DEBUG: p == c->root\n");
+		// printf("DEBUG: p=%p;pn=%p;pp=%p\n", p, p->next, p->prev);
 		if(p->next == NULL)
 		{
 			c->root = NULL;
@@ -98,18 +98,18 @@ int cremove(cache *c, celement *p)
 		else
 		{
 			p->next->prev = p->prev;
-			printf("DEBUG: prev\n");
+			// printf("DEBUG: prev\n");
 			c->root = p->next;
-			printf("DEBUG: root\n");
+			// printf("DEBUG: root\n");
 		}
 	}
 	else				// shouldn't go there unless someone will remove entries from the middle of cache
 	{
-		printf("DEBUG: p != c->root\n");
+		// printf("DEBUG: p != c->root\n");
 		p->prev->next = p->next;
 		if(p->next != NULL) p->next->prev = p->prev;
 	}
-	printf("DEBUG: free()\n");
+	// printf("DEBUG: free()\n");
 	free(p->q);
 	free(p);
 	return --c->count;
@@ -118,7 +118,7 @@ int cremove(cache *c, celement *p)
 
 int in_cache(cache *c, const char *str)
 {
-	printf("DEBUG: in_cache()\n");
+	// printf("DEBUG: in_cache()\n");
 	int i = 0;
 	if(c->root == NULL) return -1;
 	celement *p = c->root;
