@@ -71,16 +71,22 @@ done
 [ -n "$SSTEP" ] || { echo "No size step specified." ; exit 1; }
 [ -n "$TSTEP" ] || { echo "No time step specified." ; exit 1; }
 
+INITIAL_MINAGE=$MINAGE
+
 declare -a PERCENTAGES
 
 i=0
-while [ "$MINSIZE" -lt "$MAXSIZE" ]; do
-	while [ "$MINAGE" -lt "MAXAGE" ]; do
+while [ "$MINSIZE" -lt "$MAXSIZE" ]
+do
+	MINAGE=$INITIAL_MINAGE;
+	while [ "$MINAGE" -lt "$MAXAGE" ]
+	do
 		i=$[$i +1];
-		${PERCENTAGES[$i]}="${./cache_sim -f $FILENAME -s $MINSIZE -t $MINAGE}"
+		PERCENTAGES[$i]=$(./cache_sim -f $FILENAME -s $MINSIZE -t $MINAGE)
+		echo "@ S:$MINSIZE T:$MINAGE -> F:$FILENAME !${PERCENTAGES[$i]}"
 		MINAGE=$[$MINAGE + $TSTEP];
 	done
 	MINSIZE=$[$MINSIZE + $SSTEP];
 done
 
-echo "echo ${PERCENTAGES[@]} | sort -n | tail -1"
+echo $(echo ${PERCENTAGES[@]} | sort -n - | tail -1)

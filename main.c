@@ -38,16 +38,17 @@ int main(int argc, char *argv[])
 				break;
 		}
 	}
-	// printf("DEBUG: fn:%s;s:%d;t:%d\n", filename, max_size, max_time);
+	fprintf(stderr, "DEBUG: fn:%s;s:%d;t:%d\n", filename, max_size, max_time);
 
 	cache *c = (cache*)malloc(sizeof(cache));
 	cache_init(c, max_time, max_size);
 	parser_init(filename);
 
+	int total = 0;
 	while(q = parse(&now))
 	{
 		// printf("-------------------------------------------------------------------------------\nCOUNT: %d\n", c->count);
-		// printf("[%d] Update removed %d entries\n", now, cache_update(c, now));
+		fprintf(stderr, "[%d] Update removed %d entries\n", now, cache_update(c, now));
 		if(in_cache(c, q) != -1) 
 		{
 			hit++;
@@ -74,9 +75,11 @@ int main(int argc, char *argv[])
 					break;
 			}
 		}
+		total++;
 	}
 	parser_exit();
-	printf("%f%%\n", ((double)hit/(double)miss)*100);
+	fprintf(stderr, "DEBUG: H:%d;M:%d\n", hit, miss);
+	printf("%f\n", ((double)hit/(double)total)*100);
 }
 
 void print_usage(char *argv[])
