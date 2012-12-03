@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
 	{
 		fprintf(stderr, "-------------------------------------------------------------------------------\nSIZE: %f MB\n", (double)c->size _MB);
 		fprintf(stderr, "[%d] Update removed %d entries\n", now, cache_update(c, now));
-		cache_update(c, now);
 		if(in_cache(c, q) != -1) 
 		{
 			hit++;

@@ -76,20 +76,20 @@ INITIAL_MINAGE=$MINAGE
 declare -a OUTS
 
 i=0
-while [ "$MINSIZE" -lt "$MAXSIZE" ]
+while [ "$MINSIZE" -le "$MAXSIZE" ]
 do
 	MINAGE=$INITIAL_MINAGE;
-	while [ "$MINAGE" -lt "$MAXAGE" ]
+	while [ "$MINAGE" -le "$MAXAGE" ]
 	do
 		i=$[$i +1];
 		OUTS[$i]=$(./cache_sim -f $FILENAME -s $MINSIZE -t $MINAGE)
-		# echo "@ S:$MINSIZE T:$MINAGE -> F:$FILENAME !${PERCENTAGES[$i]}"
+		# echo "@ S:$MINSIZE T:$MINAGE -> F:$FILENAME !${OUTS[$i]}"
 		MINAGE=$[$MINAGE + $TSTEP];
 	done
 	MINSIZE=$[$MINSIZE + $SSTEP];
 done
 
-echo $($(for p in ${OUTS[@]}
+for p in ${OUTS[@]}
 do
-	echo $(echo $p | cut -d'~' -f3)
-done) | sort -r -n)
+	echo $p
+done
