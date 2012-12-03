@@ -8,6 +8,7 @@
 
 typedef struct __ce {
 				time_t add_time;
+				long long size;
 				char *q;
 				struct __ce *prev;
 				struct __ce *next;
@@ -15,23 +16,24 @@ typedef struct __ce {
 
 typedef struct __ca {
 				celement *root;
-				int count;
+				long long size;
 				time_t maxtime;
-				int maxsize;
+				long long maxsize;
 } cache;
 //-----------------------------------------------------------------------------
 
-void cache_init(cache *c, const time_t maxtime, const int maxsize);
+void cache_init(cache *c, const time_t maxtime, const long long maxsize);
 int cache_update(cache *c, const time_t now);
-int add_str(cache *c, const char *str, const time_t now);
+long long add_str(cache *c, const char *str, const time_t now, const int size);
 int cremove(cache *c, celement *p);
 int in_cache(cache *c, const char *str);
 //-----------------------------------------------------------------------------
 
-void cache_init(cache *c, const time_t maxtime, const int maxsize)
+void cache_init(cache *c, const time_t maxtime, const long long maxsize)
 {
+	// printf("DEBUG: cache_init()\n");
 	c->root = NULL;
-	c->count = 0;
+	c->size = 0;
 	c->maxtime = maxtime;
 	c->maxsize = maxsize;
 }
@@ -56,10 +58,10 @@ int cache_update(cache *c, const time_t now)
 }
 //-----------------------------------------------------------------------------
 
-int add_str(cache *c, const char *str, const time_t now)
+long long add_str(cache *c, const char *str, const time_t now, const int size)
 {
 	// printf("DEBUG: add_str()\n");
-	if(c->count >= c->maxsize) return -1;
+	if((c->size >= c->maxsize) || ((c->size + size) >= c->maxsize)) return -1;
 	if(in_cache(c, str) != -1) return -2;
 	else if(c->root == NULL)
 	{
@@ -69,6 +71,7 @@ int add_str(cache *c, const char *str, const time_t now)
 		c->root->add_time = now;
 		c->root->next = NULL;
 		c->root->prev = c->root;
+		c->root->size = size;
 	}
 	else
 	{
@@ -76,11 +79,13 @@ int add_str(cache *c, const char *str, const time_t now)
 		c->root->prev->next->q = (celement*)malloc(strlen(str));
 		strncpy(c->root->prev->next->q, str, strlen(str));
 		c->root->prev->next->add_time = now;
+		c->root->prev->next->size = size;
 		c->root->prev->next->next = NULL;
 		c->root->prev->next->prev = c->root->prev;
 		c->root->prev = c->root->prev->next;
 	}
-	return ++c->count;
+	c->size += size; 
+	return c->size;
 }
 //-----------------------------------------------------------------------------
 
@@ -110,9 +115,10 @@ int cremove(cache *c, celement *p)
 		if(p->next != NULL) p->next->prev = p->prev;
 	}
 	// printf("DEBUG: free()\n");
+	c->size -= p->size;
 	free(p->q);
 	free(p);
-	return --c->count;
+	return c->size;
 }
 //-----------------------------------------------------------------------------
 
