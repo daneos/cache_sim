@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	char *q;
 	time_t now = 0;
 	int o;
-	int size;
+	int size, code;
 
 	opterr = 0;
 	while((o = getopt(argc, argv, "hf:s:t:")) != -1)
@@ -49,10 +49,21 @@ int main(int argc, char *argv[])
 	parser_init(filename);
 
 	int total = 0;
-	while(q = parse(&now, &size))
+	while(q = parse(&now, &size, &code))
 	{
 		fprintf(stderr, "-------------------------------------------------------------------------------\nSIZE: %f MB\n", (double)c->size _MB);
 		fprintf(stderr, "[%d] Update removed %d entries\n", now, cache_update(c, now));
+		if(code != 200)
+		{
+			fprintf(stderr, "[%d] Reply code %d, omitting %s\n", now, code, q);
+			continue;
+		}
+		if(size == 0)
+		{
+			fprintf(stderr, "[%d] Query did not return data, omitting %s\n", now, q);
+			continue;
+		}
+
 		if(in_cache(c, q) != -1) 
 		{
 			hit++;
@@ -82,7 +93,7 @@ int main(int argc, char *argv[])
 		total++;
 	}
 	parser_exit();
-	printf("%.0f:%d~%d:%d~%f%%\n", (double)max_size _MB, max_time, hit, miss, ((double)hit/(double)total)*100);
+	printf("%.0f,%d,%d,%d,%f\n", (double)max_size _MB, max_time, hit, miss, ((double)hit/(double)total)*100);
 	return hit;
 }
 
