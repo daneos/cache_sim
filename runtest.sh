@@ -10,7 +10,7 @@ TSTEP=1800
 function usage() {
 	cat << EOF
 Usage: $0 <OPTIONS>
-Checks DNS zone serial numbers 
+Script for running HTTP cache simulation 
 Options:
 -f log file name
 -s minimal tested cache size (MB, defaults to 100)
